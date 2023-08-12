@@ -111,6 +111,41 @@ namespace WebBioMetricApp.Controllers
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
+        [HttpPost("RunningValue")]
+        public IActionResult getParkingRunningValue(MISController mISController )
+        {
+            try
+            {
+                List<SwipeRecord> swipeRecords1 = new List<SwipeRecord>();
+                //  swipeRecords1 = getatt(223216509, "192.168.29.66", 60000);
+                DataTable dt = new DataTable();
+                using (SqlConnection connection = new SqlConnection(_connectionString))
+                {
+                    connection.Open();
+                    using (SqlCommand sqlCmd = new SqlCommand(" select SN,IP,TCPPort from ControllerConfig where SN='"+ mISController.srController + "' ", connection))
+                    {
+                        SqlDataAdapter sqlDa = new SqlDataAdapter(sqlCmd);
+                        sqlCmd.CommandTimeout = 0;
+                        sqlDa.Fill(dt);
+                        connection.Close();
+                        if (dt.Rows.Count > 0)
+                        {
+                            for (int i = 0; i < dt.Rows.Count; i++)
+                            {
+                                getRunningValue(int.Parse(dt.Rows[i]["SN"].ToString()), dt.Rows[i]["IP"].ToString(), int.Parse(dt.Rows[i]["TCPPort"].ToString()), 0);
+                            }
+                        }
+                    }
+                }
+
+
+                return Ok(swipeRecords1);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
 
         public void pushdata()
         {
@@ -208,7 +243,75 @@ namespace WebBioMetricApp.Controllers
             return swipeRecords;
         }
 
-        
+        public List<SwipeRecord> getRunningValue(int ControllerSN, string IP, int PORT, int ISRestore)
+        {
+            List<SwipeRecord> swipeRecords = new List<SwipeRecord>();
+            try
+            {
+                DataTable dtSwipeRecord;
+                dtSwipeRecord = new DataTable("SwipeRecord");
+                dtSwipeRecord.Columns.Add("f_Index", System.Type.GetType("System.UInt32"));//Recording the index
+                dtSwipeRecord.Columns.Add("f_ReadDate", System.Type.GetType("System.DateTime"));  //Credit card date/time
+                dtSwipeRecord.Columns.Add("f_CardNO", System.Type.GetType("System.UInt32"));  //User card number
+                dtSwipeRecord.Columns.Add("f_DoorNO", System.Type.GetType("System.UInt32"));  //Door No.
+                dtSwipeRecord.Columns.Add("f_InOut", System.Type.GetType("System.UInt32"));// =0 is out;  =1 is in
+                dtSwipeRecord.Columns.Add("f_ReaderNO", System.Type.GetType("System.UInt32")); // Reader No.
+                dtSwipeRecord.Columns.Add("f_EventCategory", System.Type.GetType("System.UInt32")); // Event type
+                dtSwipeRecord.Columns.Add("f_ReasonNo", System.Type.GetType("System.UInt32"));// Hardware reasons
+                dtSwipeRecord.Columns.Add("f_ControllerSN", System.Type.GetType("System.UInt32"));// ControllerSN
+                dtSwipeRecord.Columns.Add("f_RecordAll", System.Type.GetType("System.String")); // the all of Record value
+                string result = "";
+                int num = -1;
+
+                if (ISRestore == 1)
+                {
+                    wgMjController wgMjController1 = new wgMjController();
+                    wgMjController1.ControllerSN = ControllerSN;
+                    wgMjController1.IP = IP;
+                    wgMjController1.PORT = PORT;
+                    wgMjController1.RestoreAllSwipeInTheControllersIP();
+
+                }
+
+
+
+                wgMjControllerSwipeOperate swipe4GetRecords = new wgMjControllerSwipeOperate(); //)
+
+                swipe4GetRecords.Clear(); //Clear Record 
+                num = swipe4GetRecords.GetSwipeRecords(ControllerSN, IP, PORT, ref dtSwipeRecord);
+
+
+                if (dtSwipeRecord.Rows.Count > 0)
+                {
+
+                    for (int i = 0; i < dtSwipeRecord.Rows.Count; i++)
+                    {
+                        SwipeRecord swipeRecord = new SwipeRecord
+                        {
+                            f_Index = dtSwipeRecord.Rows[i]["f_Index"].ToString(),
+                            ReadDate = dtSwipeRecord.Rows[i]["f_ReadDate"].ToString(),
+                            CardNO = dtSwipeRecord.Rows[i]["f_CardNO"].ToString(),
+                            DoorNO = dtSwipeRecord.Rows[i]["f_DoorNO"].ToString(),
+                            InOut = dtSwipeRecord.Rows[i]["f_InOut"].ToString(),
+                            ReaderNO = dtSwipeRecord.Rows[i]["f_ReaderNO"].ToString(),
+                            ControllerSN = dtSwipeRecord.Rows[i]["f_ControllerSN"].ToString(),
+                            f_EventCategory = dtSwipeRecord.Rows[i]["f_EventCategory"].ToString(),
+                            f_ReasonNo = dtSwipeRecord.Rows[i]["f_ReasonNo"].ToString(),
+                            f_RecordAll = dtSwipeRecord.Rows[i]["f_RecordAll"].ToString()
+                        };
+                        InsertSwipeRecord(swipeRecord);
+                        swipeRecords.Add(swipeRecord);
+                    }
+
+                }
+
+
+            }
+            catch (Exception ex) { }
+            return swipeRecords;
+        }
+
+
         public void InsertSwipeRecord(SwipeRecord swipeRecords1)
         {
             using (SqlConnection connection = new SqlConnection(_connectionString))

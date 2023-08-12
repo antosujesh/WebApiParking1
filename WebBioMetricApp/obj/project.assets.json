@@ -2970,11 +2970,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Anto SJ\\Desktop\\New folder (12)\\WebBioMetricApp2\\WebBioMetricApp\\WebApiParking.csproj",
+      "projectUniqueName": "C:\\Users\\Anto SJ\\Desktop\\New folder (12)\\1\\WebBioMetricApp2\\WebBioMetricApp\\WebApiParking.csproj",
       "projectName": "WebApiParking",
-      "projectPath": "C:\\Users\\Anto SJ\\Desktop\\New folder (12)\\WebBioMetricApp2\\WebBioMetricApp\\WebApiParking.csproj",
+      "projectPath": "C:\\Users\\Anto SJ\\Desktop\\New folder (12)\\1\\WebBioMetricApp2\\WebBioMetricApp\\WebApiParking.csproj",
       "packagesPath": "C:\\Users\\Anto SJ\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Anto SJ\\Desktop\\New folder (12)\\WebBioMetricApp2\\WebBioMetricApp\\obj\\",
+      "outputPath": "C:\\Users\\Anto SJ\\Desktop\\New folder (12)\\1\\WebBioMetricApp2\\WebBioMetricApp\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

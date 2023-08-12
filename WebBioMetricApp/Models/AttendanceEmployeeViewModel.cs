@@ -30,6 +30,10 @@
     {
         public int ISRestore { get; set; }
     }
+    public class MISController
+    {
+        public string srController { get; set; }
+    }
     public class AttendanceRecord
     {
         public int EmployeeId { get; set; }
