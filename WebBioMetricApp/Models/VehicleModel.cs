@@ -14,7 +14,7 @@
         public string KYCAddress { get; set; }
         public string SerialNumber { get; set; }
         public string CreatedBy { get; set; }
-        public DateTime? CreatedDate { get; set; }
+        public string? CreatedDate { get; set; }
         public int Status { get; set; }
         public string[] DeviceID { get; set; }
 

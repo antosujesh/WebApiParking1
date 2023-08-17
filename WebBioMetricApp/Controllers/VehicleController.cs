@@ -132,7 +132,7 @@ namespace WebApiParking.Controllers
                         command.Parameters.AddWithValue("@KYC_Address", VehicleResModel.KYCAddress);
                         command.Parameters.AddWithValue("@Serial_Number", VehicleResModel.SerialNumber);
                         command.Parameters.AddWithValue("@CreatedBy", VehicleResModel.CreatedBy);
-                        command.Parameters.AddWithValue("@CreatedDate", VehicleResModel.CreatedDate ?? DateTime.Now);
+                        command.Parameters.AddWithValue("@CreatedDate", VehicleResModel.CreatedDate);
                         command.Parameters.AddWithValue("@Status", VehicleResModel.Status);
                         command.Parameters.AddWithValue("@DeviceID", DeviceIDarraycommaSeparatedString);
                         //command.Parameters.AddWithValue("@BranchID", VehicleResModel.BranchID);
@@ -486,7 +486,7 @@ namespace WebApiParking.Controllers
                         command.Parameters.AddWithValue("@KYC_Address", VehicleResModel.KYCAddress);
                         command.Parameters.AddWithValue("@Serial_Number", VehicleResModel.SerialNumber);
                         command.Parameters.AddWithValue("@CreatedBy", VehicleResModel.CreatedBy);
-                        command.Parameters.AddWithValue("@CreatedDate", VehicleResModel.CreatedDate ?? DateTime.Now);
+                        command.Parameters.AddWithValue("@CreatedDate", VehicleResModel.CreatedDate);
                         command.Parameters.AddWithValue("@Status", VehicleResModel.Status);
                         command.Parameters.AddWithValue("@DeviceID", DeviceIDarraycommaSeparatedString);
                         //command.Parameters.AddWithValue("@BranchID", VehicleResModel.BranchID);
@@ -579,7 +579,7 @@ namespace WebApiParking.Controllers
                 List<VehicleModel> employees = new List<VehicleModel>();
                 using (SqlConnection connection = new SqlConnection(_connectionString))
                 {
-                    string query = "SELECT Driver_Img, Car_Img, Car_No, Owner_Name, Phone_No_01, Phone_No_02, EmailID, Resident_Address, KYC_Address, Serial_Number, CreatedBy, CreatedDate, Status, DeviceID " +
+                    string query = "SELECT ID,Driver_Img, Car_Img, Car_No, Owner_Name, Phone_No_01, Phone_No_02, EmailID, Resident_Address, KYC_Address, Serial_Number, CreatedBy, CreatedDate, Status, DeviceID " +
                                    "FROM tbl_Vehicles ";
 
                     if (SearchID.SearchID == 1)
@@ -612,7 +612,7 @@ namespace WebApiParking.Controllers
                                     KYCAddress = reader["KYC_Address"].ToString(),
                                     SerialNumber = reader["Serial_Number"].ToString(),
                                     CreatedBy = reader["CreatedBy"].ToString(),
-                                    CreatedDate = reader["CreatedDate"] != DBNull.Value ? (DateTime?)reader["CreatedDate"] : null,
+                                    CreatedDate = reader["CreatedDate"].ToString(),
                                     Status = Convert.ToInt32(reader["Status"]),
                                     DeviceID = reader["DeviceID"].ToString().Split(',')
 
