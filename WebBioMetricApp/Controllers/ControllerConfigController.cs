@@ -945,9 +945,6 @@ namespace WebBioMetricApp.Controllers
             return retuns;
         }
 
-
-
-
         [HttpPost("ListController")]
         public IActionResult ListController(ControllerListModelResq SearchID)
         {

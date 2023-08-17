@@ -205,6 +205,7 @@ namespace WebBioMetricApp.Controllers
             
             }
         }
+   
         public static int getaccessdata(int i, string connects, string cardNo, int SN)
         {
             int returnvalue = 0;
