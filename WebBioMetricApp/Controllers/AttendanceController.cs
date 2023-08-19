@@ -111,42 +111,7 @@ namespace WebBioMetricApp.Controllers
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
-        [HttpPost("RunningValue")]
-        public IActionResult getParkingRunningValue(MISController mISController )
-        {
-            try
-            {
-                List<SwipeRecord> swipeRecords1 = new List<SwipeRecord>();
-                //  swipeRecords1 = getatt(223216509, "192.168.29.66", 60000);
-                DataTable dt = new DataTable();
-                using (SqlConnection connection = new SqlConnection(_connectionString))
-                {
-                    connection.Open();
-                    using (SqlCommand sqlCmd = new SqlCommand(" select SN,IP,TCPPort from ControllerConfig where SN='"+ mISController.srController + "' ", connection))
-                    {
-                        SqlDataAdapter sqlDa = new SqlDataAdapter(sqlCmd);
-                        sqlCmd.CommandTimeout = 0;
-                        sqlDa.Fill(dt);
-                        connection.Close();
-                        if (dt.Rows.Count > 0)
-                        {
-                            for (int i = 0; i < dt.Rows.Count; i++)
-                            {
-                                getRunningValue(int.Parse(dt.Rows[i]["SN"].ToString()), dt.Rows[i]["IP"].ToString(), int.Parse(dt.Rows[i]["TCPPort"].ToString()), 0);
-                            }
-                        }
-                    }
-                }
-
-
-                return Ok(swipeRecords1);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
-            }
-        }
-
+       
         public void pushdata()
         {
             try

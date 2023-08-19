@@ -11,6 +11,8 @@ using WebBioMetricApp.Data;
 using WebBioMetricApp.Models;
 using WG3000_COMM.Core;
 using System.IO;
+using NPOI.HPSF;
+
 namespace WebApiParking.Controllers
 {
     [Route("api/[controller]")]
@@ -67,7 +69,7 @@ namespace WebApiParking.Controllers
         {
             try
             {
-  
+
                 ResDuplicateCardModel resDuplicateCardModel = new ResDuplicateCardModel();
                 string returnDuplicatecards = "";
                 string vv = Repo.CheckDuplicate(VehicleResModel.SerialNumber.ToString());
@@ -87,28 +89,10 @@ namespace WebApiParking.Controllers
                 string fileName = ""; string fileName1 = "";
                 string outputPath = ""; string outputPath1 = "";
                 string CarImg = "";
-                if (!string.IsNullOrEmpty(fileExtension))
-                {
-                    byte[] fileBytes = Convert.FromBase64String(ExtractBase64FromDataUrl(FromBase64));
-                    fileName = DateTime.Now.ToString("yyyyMMddHHmmss") + "SieChat." + fileExtension;
-                    string ss = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location); ;
-                     outputPath = Path.Combine(@"D:\API\MobileAPP\Chat_files\", fileName);
-                    string saveFolderPath = Path.Combine(Directory.GetCurrentDirectory(), "UploadedFiles");
-                    Directory.CreateDirectory(saveFolderPath);
-                    string filePath = Path.Combine(saveFolderPath, fileName);
-                    System.IO.File.WriteAllBytes(filePath, fileBytes);
-                }
-                if (!string.IsNullOrEmpty(fileExtension1))
-                {
-                    byte[] fileBytes1 = Convert.FromBase64String(ExtractBase64FromDataUrl(FromBase641));
-                    fileName1 = DateTime.Now.ToString("yyyyMMddHHmmss") + "SieChat." + fileExtension1;
-                    string ss = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location); ;
-                    outputPath1 = Path.Combine(@"D:\API\MobileAPP\Chat_files\", fileName1);
-                    string saveFolderPath1 = Path.Combine(Directory.GetCurrentDirectory(), "UploadedFiles");
-                    Directory.CreateDirectory(saveFolderPath1);
-                    string filePath1 = Path.Combine(saveFolderPath1, fileName);
-                    System.IO.File.WriteAllBytes(filePath1, fileBytes1);
-                }
+                GetImages(FromBase64, fileExtension, ref fileName, ref outputPath);
+
+                GetImages(FromBase641, fileExtension1, ref fileName1, ref outputPath1);
+
 
 
                 using (SqlConnection connection = new SqlConnection(_connectionString))
@@ -216,6 +200,224 @@ namespace WebApiParking.Controllers
 
             }
         }
+
+        private static void GetImages(string FromBase64, string fileExtension, ref string fileName, ref string outputPath)
+        {
+            if (!string.IsNullOrEmpty(fileExtension))
+            {
+                byte[] fileBytes = Convert.FromBase64String(ExtractBase64FromDataUrl(FromBase64));
+                fileName = DateTime.Now.ToString("yyyyMMddHHmmss") + "SieChat." + fileExtension;
+                string ss = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location); ;
+                outputPath = Path.Combine(@"D:\API\MobileAPP\Chat_files\", fileName);
+                string saveFolderPath = Path.Combine(Directory.GetCurrentDirectory(), "UploadedFiles");
+                Directory.CreateDirectory(saveFolderPath);
+                string filePath = Path.Combine(saveFolderPath, fileName);
+                System.IO.File.WriteAllBytes(filePath, fileBytes);
+            }
+        }
+
+        [HttpPost("FetchSerialNumber")]
+        public IActionResult getParkingRunningValue(MISController mISController)
+        {
+            try
+            {
+                List<SwipeRecord> swipeRecords1 = new List<SwipeRecord>();
+                //  swipeRecords1 = getatt(223216509, "192.168.29.66", 60000);
+                DataTable dt = new DataTable();
+                using (SqlConnection connection = new SqlConnection(_connectionString))
+                {
+                    connection.Open();
+                    using (SqlCommand sqlCmd = new SqlCommand(" select SN,IP,TCPPort from ControllerConfig where SN='" + mISController.srController + "' ", connection))
+                    {
+                        SqlDataAdapter sqlDa = new SqlDataAdapter(sqlCmd);
+                        sqlCmd.CommandTimeout = 0;
+                        sqlDa.Fill(dt);
+                        connection.Close();
+                        if (dt.Rows.Count > 0)
+                        {
+                            for (int i = 0; i < dt.Rows.Count; i++)
+                            {
+                                getRunningValue(int.Parse(dt.Rows[i]["SN"].ToString()), dt.Rows[i]["IP"].ToString(), int.Parse(dt.Rows[i]["TCPPort"].ToString()), 0);
+                            }
+                        }
+                    }
+                }
+
+
+                return Ok(swipeRecords1);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
+        [HttpPost("SaveImage")]
+        public IActionResult SaveCarImage(VehicleModel model)
+        {
+            if (string.IsNullOrWhiteSpace(model?.SerialNumber))
+            {
+                return BadRequest("Vehicle Serial Number is Required");
+            }
+
+            if (string.IsNullOrWhiteSpace(model?.CarImg) || string.IsNullOrWhiteSpace(model?.DriverImg))
+            {
+                return BadRequest("Both Driver and Car Images Null");
+            }
+
+            string _driverImage = model.DriverImg.Trim();
+            string _carImage = model.CarImg.Trim();
+
+            string _driverfileExtension = GetFileExtensionFromBase64(_driverImage);
+            string _carfileExtension = GetFileExtensionFromBase64(_carImage);
+            string _driverfileName = ""; string _carfileName1 = "";
+            string DriverImg = ""; string CarImg = "";
+
+            GetImages(_driverImage, _driverfileExtension, ref _driverfileName, ref DriverImg);
+
+            GetImages(_carImage, _carfileExtension, ref _carfileName1, ref CarImg);
+
+
+
+            using (SqlConnection connection = new SqlConnection(_connectionString))
+            {
+                string query = "UPDATE tbl_Vehicles set Driver_Img=@Driver_Img, Car_Img= @Car_Img WHERE serial_number = @Serial_Number";
+
+                using (SqlCommand command = new SqlCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@Driver_Img", _driverfileName);
+                    command.Parameters.AddWithValue("@Car_Img", _carfileName1);
+                    command.Parameters.AddWithValue("@Serial_Number", model.SerialNumber);
+                    connection.Open();
+                    command.ExecuteNonQuery();
+                    connection.Close();
+                }
+            }
+
+            return Ok();
+        }
+
+        [HttpGet("GetAllVehicles")]
+        public DataTable GetAllVehicles()
+        {
+
+            return null;
+        }
+
+        [HttpPost("VehicleAccess")]
+        public IActionResult VehicleAccess(VehicleModel model)
+        {
+            return Ok();
+        }
+
+        [HttpPost("SaveReader")]
+        public IActionResult SaveReader(Device device)
+        {
+            return Ok();
+        }
+
+        [HttpGet("GetReaders")]
+        public DataTable GetReaders()
+        {
+            return null;
+        }
+
+        [HttpPost("EditPermission")]
+        public IActionResult UpdatePermission(VehicleModel model)
+        {
+            return Ok();
+        }
+        public List<SwipeRecord> getRunningValue(int ControllerSN, string IP, int PORT, int ISRestore)
+        {
+            List<SwipeRecord> swipeRecords = new List<SwipeRecord>();
+            try
+            {
+                DataTable dtSwipeRecord;
+                dtSwipeRecord = new DataTable("SwipeRecord");
+                dtSwipeRecord.Columns.Add("f_Index", System.Type.GetType("System.UInt32"));//Recording the index
+                dtSwipeRecord.Columns.Add("f_ReadDate", System.Type.GetType("System.DateTime"));  //Credit card date/time
+                dtSwipeRecord.Columns.Add("f_CardNO", System.Type.GetType("System.UInt32"));  //User card number
+                dtSwipeRecord.Columns.Add("f_DoorNO", System.Type.GetType("System.UInt32"));  //Door No.
+                dtSwipeRecord.Columns.Add("f_InOut", System.Type.GetType("System.UInt32"));// =0 is out;  =1 is in
+                dtSwipeRecord.Columns.Add("f_ReaderNO", System.Type.GetType("System.UInt32")); // Reader No.
+                dtSwipeRecord.Columns.Add("f_EventCategory", System.Type.GetType("System.UInt32")); // Event type
+                dtSwipeRecord.Columns.Add("f_ReasonNo", System.Type.GetType("System.UInt32"));// Hardware reasons
+                dtSwipeRecord.Columns.Add("f_ControllerSN", System.Type.GetType("System.UInt32"));// ControllerSN
+                dtSwipeRecord.Columns.Add("f_RecordAll", System.Type.GetType("System.String")); // the all of Record value
+                string result = "";
+                int num = -1;
+
+                if (ISRestore == 1)
+                {
+                    wgMjController wgMjController1 = new wgMjController();
+                    wgMjController1.ControllerSN = ControllerSN;
+                    wgMjController1.IP = IP;
+                    wgMjController1.PORT = PORT;
+                    wgMjController1.RestoreAllSwipeInTheControllersIP();
+
+                }
+
+
+
+                wgMjControllerSwipeOperate swipe4GetRecords = new wgMjControllerSwipeOperate(); //)
+
+                swipe4GetRecords.Clear(); //Clear Record 
+                num = swipe4GetRecords.GetSwipeRecords(ControllerSN, IP, PORT, ref dtSwipeRecord);
+
+
+                if (dtSwipeRecord.Rows.Count > 0)
+                {
+
+                    for (int i = 0; i < dtSwipeRecord.Rows.Count; i++)
+                    {
+                        SwipeRecord swipeRecord = new SwipeRecord
+                        {
+                            f_Index = dtSwipeRecord.Rows[i]["f_Index"].ToString(),
+                            ReadDate = dtSwipeRecord.Rows[i]["f_ReadDate"].ToString(),
+                            CardNO = dtSwipeRecord.Rows[i]["f_CardNO"].ToString(),
+                            DoorNO = dtSwipeRecord.Rows[i]["f_DoorNO"].ToString(),
+                            InOut = dtSwipeRecord.Rows[i]["f_InOut"].ToString(),
+                            ReaderNO = dtSwipeRecord.Rows[i]["f_ReaderNO"].ToString(),
+                            ControllerSN = dtSwipeRecord.Rows[i]["f_ControllerSN"].ToString(),
+                            f_EventCategory = dtSwipeRecord.Rows[i]["f_EventCategory"].ToString(),
+                            f_ReasonNo = dtSwipeRecord.Rows[i]["f_ReasonNo"].ToString(),
+                            f_RecordAll = dtSwipeRecord.Rows[i]["f_RecordAll"].ToString()
+                        };
+                        InsertSwipeRecord(swipeRecord);
+                        swipeRecords.Add(swipeRecord);
+                    }
+
+                }
+
+
+            }
+            catch (Exception ex) { }
+            return swipeRecords;
+        }
+        public void InsertSwipeRecord(SwipeRecord swipeRecords1)
+        {
+            using (SqlConnection connection = new SqlConnection(_connectionString))
+            {
+                connection.Open();
+                SqlCommand command = new SqlCommand("InsertOrUpdateSwipeRecord", connection);
+                command.CommandType = CommandType.StoredProcedure;
+                command.Parameters.AddWithValue("@f_Index", swipeRecords1.f_Index);
+                command.Parameters.AddWithValue("@ReadDate", swipeRecords1.ReadDate);
+                command.Parameters.AddWithValue("@CardNO", swipeRecords1.CardNO);
+                command.Parameters.AddWithValue("@DoorNO", swipeRecords1.DoorNO);
+                command.Parameters.AddWithValue("@InOut", swipeRecords1.InOut);
+                command.Parameters.AddWithValue("@ReaderNO", swipeRecords1.ReaderNO);
+                command.Parameters.AddWithValue("@ControllerSN", swipeRecords1.ControllerSN);
+                command.Parameters.AddWithValue("@f_EventCategory", swipeRecords1.f_EventCategory);
+                command.Parameters.AddWithValue("@f_ReasonNo", swipeRecords1.f_ReasonNo);
+                command.Parameters.AddWithValue("@f_RecordAll", swipeRecords1.f_RecordAll);
+                command.ExecuteNonQuery();
+
+            }
+
+
+        }
+
         public static int getaccessdata(int i, string connects, string cardNo, int SN)
         {
             int returnvalue = 0;
@@ -598,7 +800,7 @@ namespace WebApiParking.Controllers
                         {
                             while (reader.Read())
                             {
-                                VehicleModel vehicleModel  = new VehicleModel
+                                VehicleModel vehicleModel = new VehicleModel
                                 {
                                     ID = reader["ID"].ToString(),
                                     DriverImg = reader["Driver_Img"].ToString(),
