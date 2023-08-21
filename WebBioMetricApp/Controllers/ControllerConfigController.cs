@@ -40,7 +40,7 @@ namespace WebBioMetricApp.Controllers
                 return StatusCode(500, "An error occurred while configuring the controller.\n\n" + ex.ToString());
             }
         }
-        public ReSControllerSetDateTimeModel SetControllerDatetimeF(ReqControllerSetDateTimeModel configModel)
+        private ReSControllerSetDateTimeModel SetControllerDatetimeF(ReqControllerSetDateTimeModel configModel)
         {
             ReSControllerSetDateTimeModel reSControllerSetDateTimeModel = new ReSControllerSetDateTimeModel();
             try
@@ -265,7 +265,7 @@ namespace WebBioMetricApp.Controllers
         }
 
 
-        public void USetController(ControllerConfigSetModel configModel)
+        private void USetController(ControllerConfigSetModel configModel)
         {
             try
             {
@@ -713,7 +713,7 @@ namespace WebBioMetricApp.Controllers
         
         
         }
-        public static int getaccessdata(int i, string connects, string cardNo, int SN)
+        private static int getaccessdata(int i, string connects, string cardNo, int SN)
         {
             int returnvalue = 0;
             string columnname = "f_ControlSegID" + i.ToString();
@@ -744,7 +744,7 @@ namespace WebBioMetricApp.Controllers
 
 
         }
-        public ReqAddPrivilegeUser GetCardNoID(int EmployeeID)
+        private ReqAddPrivilegeUser GetCardNoID(int EmployeeID)
         {
             ReqAddPrivilegeUser reqAddPrivilegeUser = new ReqAddPrivilegeUser();
             int StrNo = 0;
@@ -773,7 +773,7 @@ namespace WebBioMetricApp.Controllers
 
             return reqAddPrivilegeUser;
         }
-        public int GetControllerID(string ControllerName)
+        private int GetControllerID(string ControllerName)
         {
             int StrNo = 0;
             try
@@ -801,7 +801,7 @@ namespace WebBioMetricApp.Controllers
             return StrNo;
         }
 
-        public static string  AddPrivilege1(PrivilegeRequestModel requestModel, string _connectionString)
+        private static string  AddPrivilege1(PrivilegeRequestModel requestModel, string _connectionString)
         {
             string retuns = "";
             try
@@ -1102,7 +1102,7 @@ namespace WebBioMetricApp.Controllers
             }
         }
 
-        public static string  FindReaderStatus(ControllerParaModel controllerPara, int DoorNo)
+        private static string  FindReaderStatus(ControllerParaModel controllerPara, int DoorNo)
         {
             string Status = "NA";
             try
@@ -1329,8 +1329,8 @@ namespace WebBioMetricApp.Controllers
         }
 
 
-  
-        public void CreateBulkEmployee(Employee employee)
+
+        private void CreateBulkEmployee(Employee employee)
         {
             try
             {

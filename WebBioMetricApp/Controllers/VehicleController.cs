@@ -12,6 +12,7 @@ using WebBioMetricApp.Models;
 using WG3000_COMM.Core;
 using System.IO;
 using NPOI.HPSF;
+using WebApiParking.Helper;
 
 namespace WebApiParking.Controllers
 {
@@ -298,10 +299,13 @@ namespace WebApiParking.Controllers
         }
 
         [HttpGet("GetAllVehicles")]
-        public DataTable GetAllVehicles()
+        public string GetAllVehicles()
         {
+            DataAccessDAO dataAccess = new(_configuration);
 
-            return null;
+            DataTable dtVehicles = dataAccess.GetData("Select * from tbl_vehicles");
+
+            return Utility.DataTableToJSON(dtVehicles);
         }
 
         [HttpPost("VehicleAccess")]
@@ -311,15 +315,19 @@ namespace WebApiParking.Controllers
         }
 
         [HttpPost("SaveReader")]
-        public IActionResult SaveReader(Device device)
+        public string SaveReader(Device device)
         {
-            return Ok();
+            return string.Empty;
         }
 
         [HttpGet("GetReaders")]
-        public DataTable GetReaders()
+        public string GetReaders()
         {
-            return null;
+            DataAccessDAO dataAccess = new(_configuration);
+
+            DataTable dtVehicles = dataAccess.GetData("Select * from DeviceReaders");
+
+            return Utility.DataTableToJSON(dtVehicles);
         }
 
         [HttpPost("EditPermission")]
@@ -327,7 +335,7 @@ namespace WebApiParking.Controllers
         {
             return Ok();
         }
-        public List<SwipeRecord> getRunningValue(int ControllerSN, string IP, int PORT, int ISRestore)
+        private List<SwipeRecord> getRunningValue(int ControllerSN, string IP, int PORT, int ISRestore)
         {
             List<SwipeRecord> swipeRecords = new List<SwipeRecord>();
             try
@@ -394,7 +402,7 @@ namespace WebApiParking.Controllers
             catch (Exception ex) { }
             return swipeRecords;
         }
-        public void InsertSwipeRecord(SwipeRecord swipeRecords1)
+        private void InsertSwipeRecord(SwipeRecord swipeRecords1)
         {
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
@@ -418,7 +426,7 @@ namespace WebApiParking.Controllers
 
         }
 
-        public static int getaccessdata(int i, string connects, string cardNo, int SN)
+        private static int getaccessdata(int i, string connects, string cardNo, int SN)
         {
             int returnvalue = 0;
             string columnname = "f_ControlSegID" + i.ToString();
@@ -449,7 +457,7 @@ namespace WebApiParking.Controllers
 
 
         }
-        public int GetControllerID(string ControllerName)
+        private int GetControllerID(string ControllerName)
         {
             int StrNo = 0;
             try
@@ -477,7 +485,7 @@ namespace WebApiParking.Controllers
             return StrNo;
         }
 
-        public void AddPrivilege(PrivilegeRequestModel requestModel)
+        private void AddPrivilege(PrivilegeRequestModel requestModel)
         {
             try
             {

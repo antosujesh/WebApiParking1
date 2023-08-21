@@ -112,7 +112,7 @@ namespace WebBioMetricApp.Controllers
             }
         }
        
-        public void pushdata()
+        private void pushdata()
         {
             try
             {
@@ -140,7 +140,7 @@ namespace WebBioMetricApp.Controllers
             }catch(Exception ex) { }
         }
 
-        public List<SwipeRecord> getatt(int ControllerSN,string IP, int PORT, int ISRestore)
+        private List<SwipeRecord> getatt(int ControllerSN,string IP, int PORT, int ISRestore)
         {
             List<SwipeRecord> swipeRecords = new List<SwipeRecord>();
             try
@@ -208,7 +208,7 @@ namespace WebBioMetricApp.Controllers
             return swipeRecords;
         }
 
-        public List<SwipeRecord> getRunningValue(int ControllerSN, string IP, int PORT, int ISRestore)
+        private List<SwipeRecord> getRunningValue(int ControllerSN, string IP, int PORT, int ISRestore)
         {
             List<SwipeRecord> swipeRecords = new List<SwipeRecord>();
             try
@@ -277,7 +277,7 @@ namespace WebBioMetricApp.Controllers
         }
 
 
-        public void InsertSwipeRecord(SwipeRecord swipeRecords1)
+        private void InsertSwipeRecord(SwipeRecord swipeRecords1)
         {
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
@@ -301,7 +301,7 @@ namespace WebBioMetricApp.Controllers
 
         }
 
-        public IEnumerable<AttendanceRecord> GetAttendanceRecords1(string fromDate, string toDate, int?[] EmployeeId, string SP)
+        private IEnumerable<AttendanceRecord> GetAttendanceRecords1(string fromDate, string toDate, int?[] EmployeeId, string SP)
         {
             //if(EmployeeId == null) {
             //    EmployeeId = {0};
@@ -414,7 +414,7 @@ namespace WebBioMetricApp.Controllers
 
             return attendanceRecords;
         }
-        public IEnumerable<MovementRecord> GetSwipeRecords(string cardNo)
+        private IEnumerable<MovementRecord> GetSwipeRecords(string cardNo)
         {
             List<MovementRecord> swipeRecords = new List<MovementRecord>();
 

@@ -27,13 +27,13 @@ namespace WebBioMetricApp.Controllers
         [HttpPost("Upload")]
         public async Task<ResDuplicateCardModel> UploadExcel([FromForm] FileUploadModel model)
         {
-            ResDuplicateCardModel resDuplicateCardModel = new ResDuplicateCardModel();  
+            ResDuplicateCardModel resDuplicateCardModel = new ResDuplicateCardModel();
             string returnDuplicatecards = "";
             uploadEmp uploadEmp = new uploadEmp();
             if (model.File == null || model.File.Length == 0)
             {
                 resDuplicateCardModel.Status = "N";
-                 resDuplicateCardModel.Result = "No file selected.";
+                resDuplicateCardModel.Result = "No file selected.";
                 return resDuplicateCardModel;
             }
             var projectDirectory = AppDomain.CurrentDomain.BaseDirectory;
@@ -41,7 +41,7 @@ namespace WebBioMetricApp.Controllers
             //var filePath = projectDirectory;// Path.GetTempFileName();
             DateTime now = DateTime.Now;
             string formattedDateTime = now.ToString("ddMMyyyyhhmmss");
-            string filePath = Path.Combine(projectDirectory, formattedDateTime+"Book1.xlsx");
+            string filePath = Path.Combine(projectDirectory, formattedDateTime + "Book1.xlsx");
             using (var stream = new FileStream(filePath, FileMode.Create))
             {
                 await model.File.CopyToAsync(stream);
@@ -70,11 +70,11 @@ namespace WebBioMetricApp.Controllers
 
                     switch (col)
                     {
-    
+
                         case 2: // Card Number
                             cardNumber = cellValue.ToString();
                             break;
-                   
+
                             // Add more cases for additional columns if needed
                     }
                     string vv = Repo.CheckDuplicate(cardNumber);
@@ -92,8 +92,8 @@ namespace WebBioMetricApp.Controllers
                 resDuplicateCardModel.Status = "D";
                 return resDuplicateCardModel;
             }
-            
-             Employee employeeResModel = new Employee();
+
+            Employee employeeResModel = new Employee();
 
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
@@ -160,7 +160,7 @@ namespace WebBioMetricApp.Controllers
                         //{
                         //    Console.WriteLine(part);
                         //}
-                        string ReaderNo = parts[0].ToString().Replace("\"", "").Replace("\\","").Replace("[","").Replace("]","");
+                        string ReaderNo = parts[0].ToString().Replace("\"", "").Replace("\\", "").Replace("[", "").Replace("]", "");
                         if (ReaderNo == "1")
                         {
                             Acc1 = "1";
@@ -194,7 +194,7 @@ namespace WebBioMetricApp.Controllers
                         uploadEmp.AddPrivilege(privilegeRequestModel);
                     }
 
-                  
+
 
 
                     // Insert the values into the table
@@ -223,7 +223,7 @@ namespace WebBioMetricApp.Controllers
             System.Runtime.InteropServices.Marshal.ReleaseComObject(excelApp);
 
 
-     
+
 
             //// Delete the temporary file
             System.IO.File.Delete(filePath);
@@ -232,9 +232,9 @@ namespace WebBioMetricApp.Controllers
             resDuplicateCardModel.Status = "Y";
             return resDuplicateCardModel;
 
-          
+
         }
-        public static int getaccessdata(int i, string connects, string cardNo, int SN)
+        private static int getaccessdata(int i, string connects, string cardNo, int SN)
         {
             int returnvalue = 0;
             string columnname = "f_ControlSegID" + i.ToString();
@@ -273,9 +273,9 @@ namespace WebBioMetricApp.Controllers
             return validExtensions.Contains(extension, StringComparer.OrdinalIgnoreCase);
         }
 
-        public void getss(ReqAddPrivilegeToUser requestModel)
+        private void getss(ReqAddPrivilegeToUser requestModel)
         {
-           
+
             ResAddPrivilege resAddPrivilege = new ResAddPrivilege();
             uploadEmp uploadEmp = new uploadEmp();
             try
@@ -397,27 +397,18 @@ namespace WebBioMetricApp.Controllers
 
                 resAddPrivilege.Result = "Privilege data received and saved successfully.";
                 // Return a success response
-              
+
             }
             catch (Exception ex)
             {
                 resAddPrivilege.Result = "An error occurred while processing and saving the privilege data.";
                 // Return an error response
-             
+
             }
 
 
 
         }
 
-
-
-
-
-
-     
     }
-
-
-
 }

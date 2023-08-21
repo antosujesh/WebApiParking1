@@ -205,8 +205,8 @@ namespace WebBioMetricApp.Controllers
             
             }
         }
-   
-        public static int getaccessdata(int i, string connects, string cardNo, int SN)
+
+        private static int getaccessdata(int i, string connects, string cardNo, int SN)
         {
             int returnvalue = 0;
             string columnname = "f_ControlSegID" + i.ToString();
@@ -237,7 +237,7 @@ namespace WebBioMetricApp.Controllers
 
 
         }
-        public int GetControllerID(string ControllerName)
+        private int GetControllerID(string ControllerName)
         {
              int StrNo = 0;
             try
@@ -265,7 +265,7 @@ namespace WebBioMetricApp.Controllers
             return StrNo;
         }
 
-        public void AddPrivilege(PrivilegeRequestModel requestModel)
+        private void AddPrivilege(PrivilegeRequestModel requestModel)
         {
             try
             {
@@ -403,7 +403,7 @@ namespace WebBioMetricApp.Controllers
             }
         }
 
-        public static string deletePrivilege(PrivilegeRequestModel requestModel, string _connectionString)
+        private static string deletePrivilege(PrivilegeRequestModel requestModel, string _connectionString)
         {
             string returnMsg = "";
             try
@@ -753,7 +753,7 @@ namespace WebBioMetricApp.Controllers
 
 
 
-        public ReqAddPrivilegeUser GetCardNoID(int EmployeeID)
+        private ReqAddPrivilegeUser GetCardNoID(int EmployeeID)
         {
             ReqAddPrivilegeUser reqAddPrivilegeUser = new ReqAddPrivilegeUser();
             int StrNo = 0;
@@ -925,7 +925,7 @@ namespace WebBioMetricApp.Controllers
 
 
         }
-        public static string AddPrivilege1(PrivilegeRequestModel requestModel, string _connectionString, string EmployeeId)
+        private static string AddPrivilege1(PrivilegeRequestModel requestModel, string _connectionString, string EmployeeId)
         {
             string retuns = "";
             try

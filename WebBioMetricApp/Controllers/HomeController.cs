@@ -15,7 +15,8 @@ namespace WebBioMetricApp.Controllers
 
         public IActionResult Index()
         {
-            return View();
+            _logger.LogInformation("First");
+            return Ok();
         }
 
         public IActionResult Privacy()
