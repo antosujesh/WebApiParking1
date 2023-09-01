@@ -6,8 +6,7 @@ using WebBioMetricApp.Models;
 
 namespace WebBioMetricApp.Controllers
 {
-    [Route("api/companies")]
-    [ApiController]
+    
     public class CompanyController : ControllerBase
     {
         private readonly IConfiguration _configuration;

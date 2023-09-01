@@ -82,17 +82,17 @@ namespace WebApiParking.Controllers
                     return resDuplicateCardModel;
                 }
 
-                string FromBase64 = VehicleResModel.DriverImg.Trim();
-                string FromBase641 = VehicleResModel.CarImg.Trim();
+                //string FromBase64 = VehicleResModel.DriverImg.Trim();
+                //string FromBase641 = VehicleResModel.CarImg.Trim();
 
-                string fileExtension = GetFileExtensionFromBase64(FromBase64);
-                string fileExtension1 = GetFileExtensionFromBase64(FromBase641);
-                string fileName = ""; string fileName1 = "";
-                string outputPath = ""; string outputPath1 = "";
-                string CarImg = "";
-                GetImages(FromBase64, fileExtension, ref fileName, ref outputPath);
+                //string fileExtension = GetFileExtensionFromBase64(FromBase64);
+                //string fileExtension1 = GetFileExtensionFromBase64(FromBase641);
+                //string fileName = ""; string fileName1 = "";
+                //string outputPath = ""; string outputPath1 = "";
+                //string CarImg = "";
+                //GetImages(FromBase64, fileExtension, ref fileName, ref outputPath);
 
-                GetImages(FromBase641, fileExtension1, ref fileName1, ref outputPath1);
+                //GetImages(FromBase641, fileExtension1, ref fileName1, ref outputPath1);
 
 
 
@@ -106,8 +106,8 @@ namespace WebApiParking.Controllers
 
                     using (SqlCommand command = new SqlCommand(query, connection))
                     {
-                        command.Parameters.AddWithValue("@Driver_Img", fileName);
-                        command.Parameters.AddWithValue("@Car_Img", fileName1);
+                        command.Parameters.AddWithValue("@Driver_Img", VehicleResModel.DriverImg);
+                        command.Parameters.AddWithValue("@Car_Img", VehicleResModel.CarImg);
                         command.Parameters.AddWithValue("@Car_No", VehicleResModel.CarNo);
                         command.Parameters.AddWithValue("@Owner_Name", VehicleResModel.OwnerName);
                         command.Parameters.AddWithValue("@Phone_No_01", VehicleResModel.PhoneNo01);
@@ -130,72 +130,72 @@ namespace WebApiParking.Controllers
                 }
 
                 //employeeResModel.Result = "Employee created successfully";
-                PrivilegeRequestModel privilegeRequestModel = new PrivilegeRequestModel();
-                privilegeRequestModel.FCardNo = uint.Parse(VehicleResModel.SerialNumber.ToString());
-                privilegeRequestModel.FBeginYMD = DateTime.Parse("2023-05-01");
-                privilegeRequestModel.FEndYMD = DateTime.Parse("2099-05-01");
-                privilegeRequestModel.DoorName = "";
-                privilegeRequestModel.FPIN = "0";
-                privilegeRequestModel.FControlSegID1 = 0;
-                privilegeRequestModel.FControlSegID2 = 0;
-                privilegeRequestModel.FControlSegID3 = 0;
-                privilegeRequestModel.FControlSegID4 = 0;
-                string[] values = VehicleResModel.DeviceID;
-                int t = 1;
-                foreach (string value in values)
-                {
-                    string Acc1 = "No", Acc2 = "No", Acc3 = "No", Acc4 = "No";
-                    string[] parts = value.Split('-');
+                //PrivilegeRequestModel privilegeRequestModel = new PrivilegeRequestModel();
+                //privilegeRequestModel.FCardNo = uint.Parse(VehicleResModel.SerialNumber.ToString());
+                //privilegeRequestModel.FBeginYMD = DateTime.Parse("2023-05-01");
+                //privilegeRequestModel.FEndYMD = DateTime.Parse("2099-05-01");
+                //privilegeRequestModel.DoorName = "";
+                //privilegeRequestModel.FPIN = "0";
+                //privilegeRequestModel.FControlSegID1 = 0;
+                //privilegeRequestModel.FControlSegID2 = 0;
+                //privilegeRequestModel.FControlSegID3 = 0;
+                //privilegeRequestModel.FControlSegID4 = 0;
+                //string[] values = VehicleResModel.DeviceID;
+                //int t = 1;
+                //foreach (string value in values)
+                //{
+                //    string Acc1 = "No", Acc2 = "No", Acc3 = "No", Acc4 = "No";
+                //    string[] parts = value.Split('-');
 
-                    //foreach (string part in parts)
-                    //{
-                    //    Console.WriteLine(part);
-                    //}
-                    string ReaderNo = parts[0].ToString();
-                    if (ReaderNo == "1")
-                    {
-                        Acc1 = "1";
-                        // privilegeRequestModel.FControlSegID1 = 1;
-                    }
-                    if (ReaderNo == "2")
-                    {
-                        Acc2 = "1";
-                        //privilegeRequestModel.FControlSegID2 = 1;
-                    }
-
-
-                    if (ReaderNo == "3")
-                    {
-                        Acc3 = "1";
-                        //privilegeRequestModel.FControlSegID3 = 1;
-                    }
+                //    //foreach (string part in parts)
+                //    //{
+                //    //    Console.WriteLine(part);
+                //    //}
+                //    string ReaderNo = parts[0].ToString();
+                //    if (ReaderNo == "1")
+                //    {
+                //        Acc1 = "1";
+                //        // privilegeRequestModel.FControlSegID1 = 1;
+                //    }
+                //    if (ReaderNo == "2")
+                //    {
+                //        Acc2 = "1";
+                //        //privilegeRequestModel.FControlSegID2 = 1;
+                //    }
 
 
-                    if (ReaderNo == "4")
-                    {
-                        Acc4 = "1";
-                        //privilegeRequestModel.FControlSegID4 = 1;
-                    }
+                //    if (ReaderNo == "3")
+                //    {
+                //        Acc3 = "1";
+                //        //privilegeRequestModel.FControlSegID3 = 1;
+                //    }
 
-                    privilegeRequestModel.ControllerSN = GetControllerID(parts[1].ToString());
-                    if (Acc1 == "1") { privilegeRequestModel.FControlSegID1 = 1; } else { privilegeRequestModel.FControlSegID1 = (byte)getaccessdata(1, _connectionString, VehicleResModel.SerialNumber.ToString(), privilegeRequestModel.ControllerSN); }
-                    if (Acc2 == "1") { privilegeRequestModel.FControlSegID2 = 1; } else { privilegeRequestModel.FControlSegID2 = (byte)getaccessdata(2, _connectionString, VehicleResModel.SerialNumber.ToString(), privilegeRequestModel.ControllerSN); }
-                    if (Acc3 == "1") { privilegeRequestModel.FControlSegID3 = 1; } else { privilegeRequestModel.FControlSegID3 = (byte)getaccessdata(3, _connectionString, VehicleResModel.SerialNumber.ToString(), privilegeRequestModel.ControllerSN); }
-                    if (Acc4 == "1") { privilegeRequestModel.FControlSegID4 = 1; } else { privilegeRequestModel.FControlSegID4 = (byte)getaccessdata(4, _connectionString, VehicleResModel.SerialNumber.ToString(), privilegeRequestModel.ControllerSN); }
-                    AddPrivilege(privilegeRequestModel);
-                }
+
+                //    if (ReaderNo == "4")
+                //    {
+                //        Acc4 = "1";
+                //        //privilegeRequestModel.FControlSegID4 = 1;
+                //    }
+
+                //    privilegeRequestModel.ControllerSN = GetControllerID(parts[1].ToString());
+                //    if (Acc1 == "1") { privilegeRequestModel.FControlSegID1 = 1; } else { privilegeRequestModel.FControlSegID1 = (byte)getaccessdata(1, _connectionString, VehicleResModel.SerialNumber.ToString(), privilegeRequestModel.ControllerSN); }
+                //    if (Acc2 == "1") { privilegeRequestModel.FControlSegID2 = 1; } else { privilegeRequestModel.FControlSegID2 = (byte)getaccessdata(2, _connectionString, VehicleResModel.SerialNumber.ToString(), privilegeRequestModel.ControllerSN); }
+                //    if (Acc3 == "1") { privilegeRequestModel.FControlSegID3 = 1; } else { privilegeRequestModel.FControlSegID3 = (byte)getaccessdata(3, _connectionString, VehicleResModel.SerialNumber.ToString(), privilegeRequestModel.ControllerSN); }
+                //    if (Acc4 == "1") { privilegeRequestModel.FControlSegID4 = 1; } else { privilegeRequestModel.FControlSegID4 = (byte)getaccessdata(4, _connectionString, VehicleResModel.SerialNumber.ToString(), privilegeRequestModel.ControllerSN); }
+                //    AddPrivilege(privilegeRequestModel);
+                //}
 
 
 
                 // AddPrivilege(privilegeRequestModel);
-                resDuplicateCardModel.Result = "Employee created successfully.";
+                resDuplicateCardModel.Result = "Vehicle added successfully.";
                 resDuplicateCardModel.Status = "Y";
                 return resDuplicateCardModel;
             }
             catch (Exception ex)
             {
                 ResDuplicateCardModel resDuplicateCardModel1 = new ResDuplicateCardModel();
-                resDuplicateCardModel1.Result = "Problem in creating employee details ";
+                resDuplicateCardModel1.Result = "Problem in creating Vehicle details ";
                 resDuplicateCardModel1.Status = "N";
                 return resDuplicateCardModel1;
 
@@ -253,7 +253,7 @@ namespace WebApiParking.Controllers
             }
         }
 
-        [HttpPost("SaveImage")]
+        [HttpPost("EditImage")]
         public IActionResult SaveCarImage(VehicleModel model)
         {
             if (string.IsNullOrWhiteSpace(model?.SerialNumber))
@@ -266,28 +266,14 @@ namespace WebApiParking.Controllers
                 return BadRequest("Both Driver and Car Images Null");
             }
 
-            string _driverImage = model.DriverImg.Trim();
-            string _carImage = model.CarImg.Trim();
-
-            string _driverfileExtension = GetFileExtensionFromBase64(_driverImage);
-            string _carfileExtension = GetFileExtensionFromBase64(_carImage);
-            string _driverfileName = ""; string _carfileName1 = "";
-            string DriverImg = ""; string CarImg = "";
-
-            GetImages(_driverImage, _driverfileExtension, ref _driverfileName, ref DriverImg);
-
-            GetImages(_carImage, _carfileExtension, ref _carfileName1, ref CarImg);
-
-
-
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
                 string query = "UPDATE tbl_Vehicles set Driver_Img=@Driver_Img, Car_Img= @Car_Img WHERE serial_number = @Serial_Number";
 
                 using (SqlCommand command = new SqlCommand(query, connection))
                 {
-                    command.Parameters.AddWithValue("@Driver_Img", _driverfileName);
-                    command.Parameters.AddWithValue("@Car_Img", _carfileName1);
+                    command.Parameters.AddWithValue("@Driver_Img", model.DriverImg.Trim());
+                    command.Parameters.AddWithValue("@Car_Img", model.CarImg.Trim());
                     command.Parameters.AddWithValue("@Serial_Number", model.SerialNumber);
                     connection.Open();
                     command.ExecuteNonQuery();
@@ -308,20 +294,8 @@ namespace WebApiParking.Controllers
             return Utility.DataTableToJSON(dtVehicles);
         }
 
-        [HttpPost("VehicleAccess")]
-        public IActionResult VehicleAccess(VehicleModel model)
-        {
-            return Ok();
-        }
-
-        [HttpPost("SaveReader")]
-        public string SaveReader(Device device)
-        {
-            return string.Empty;
-        }
-
-        [HttpGet("GetReaders")]
-        public string GetReaders()
+        [HttpGet("GetAllReaders")]
+        public string GetAllReaders()
         {
             DataAccessDAO dataAccess = new(_configuration);
 
@@ -330,10 +304,121 @@ namespace WebApiParking.Controllers
             return Utility.DataTableToJSON(dtVehicles);
         }
 
+        [HttpPost("VehicleAccess")]
+        public IActionResult VehicleAccess(VehicleModel model)
+        {
+            return Ok();
+        }
+
+        [HttpPost("SaveReader")]
+        public IActionResult SaveReader(DeviceReader reader)
+        {
+            using (SqlConnection connection = new SqlConnection(_connectionString))
+            {
+                string query = "UPDATE DeviceReaders set ReaderDesc=@desc WHERE ReaderID = @readerId";
+
+                using (SqlCommand command = new SqlCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@readerId", reader.ID);
+                    command.Parameters.AddWithValue("@desc", reader.Description);
+                   
+                    connection.Open();
+                    command.ExecuteNonQuery();
+                    connection.Close();
+                }
+            }
+            return Ok();
+        }
+
+        [HttpGet("GetReaders")]
+        public string GetReaders(string deviceIds)
+        {
+            DataAccessDAO dataAccess = new(_configuration);
+
+            string query = "Select * from DeviceReaders Where DeviceId in ({0})";
+
+            string conditionValue = string.Empty;
+
+            if (deviceIds.Contains(','))
+            {
+                foreach (var item in deviceIds.Split(','))
+                {
+                    conditionValue = conditionValue + string.Format("'{0}',", item);
+                }
+                conditionValue = conditionValue.Remove(conditionValue.Length - 1);
+            }
+            else
+                conditionValue = deviceIds;
+
+            DataTable dtVehicles = dataAccess.GetData(string.Format(query, conditionValue));
+
+            return Utility.DataTableToJSON(dtVehicles);
+        }
+
         [HttpPost("EditPermission")]
         public IActionResult UpdatePermission(VehicleModel model)
         {
             return Ok();
+        }
+
+        [HttpPost("AddDevice")]
+        public IActionResult CreateDevice(Device device)
+        {
+            try
+            {
+                using (SqlConnection connection = new SqlConnection(_connectionString))
+                {
+                    string query = "INSERT INTO Devices (DeviceID,DeviceName, CreatedBy, CreatedDate, DeviceLocation, DeviceSeries) " +
+                                   "VALUES (@DeviceID,@DeviceName, @CreatedBy, @CreatedDate, @DeviceLocation, @DeviceSeries)";
+                    using (SqlCommand command = new SqlCommand(query, connection))
+                    {
+                        command.Parameters.AddWithValue("@DeviceID", device.DeviceID);
+                        command.Parameters.AddWithValue("@DeviceName", device.DeviceName);
+                        command.Parameters.AddWithValue("@CreatedBy", device.CreatedBy);
+                        command.Parameters.AddWithValue("@CreatedDate", device.CreatedDate);
+                        command.Parameters.AddWithValue("@DeviceLocation", device.DeviceLocation);
+                        command.Parameters.AddWithValue("@DeviceSeries", device.DeviceSeries);
+
+                        connection.Open();
+                        command.ExecuteNonQuery();
+                    }
+                }
+                return Ok("Device created successfully");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
+        [HttpPost("AddReader")]
+        public IActionResult CreateDeviceReader(DeviceReader reader)
+        {
+            try
+            {
+                using (SqlConnection connection = new SqlConnection(_connectionString))
+                {
+                    string query = "INSERT INTO DeviceReaders (ReaderId,DeviceId, CreatedBy, CreatedDate, ReaderName, ReaderDesc) " +
+                                   "VALUES (@ReaderID,@DeviceID, @CreatedBy, @CreatedDate, @ReaderName, @ReaderDesc)";
+                    using (SqlCommand command = new SqlCommand(query, connection))
+                    {
+                        command.Parameters.AddWithValue("@ReaderID", reader.ID);
+                        command.Parameters.AddWithValue("@DeviceID", reader.DeviceID);
+                        command.Parameters.AddWithValue("@CreatedBy", reader.CreatedBy);
+                        command.Parameters.AddWithValue("@CreatedDate", reader.CreatedDate);
+                        command.Parameters.AddWithValue("@ReaderName", reader.Name);
+                        command.Parameters.AddWithValue("@ReaderDesc", reader.Description);
+
+                        connection.Open();
+                        command.ExecuteNonQuery();
+                    }
+                }
+                return Ok("Device Reader created successfully");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
         }
         private List<SwipeRecord> getRunningValue(int ControllerSN, string IP, int PORT, int ISRestore)
         {

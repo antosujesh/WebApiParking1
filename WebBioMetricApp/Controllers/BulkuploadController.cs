@@ -11,8 +11,6 @@ using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace WebBioMetricApp.Controllers
 {
-    [Route("api/[controller]")]
-    [ApiController]
     public class BulkuploadController : ControllerBase
     {
         private readonly IConfiguration _configuration;

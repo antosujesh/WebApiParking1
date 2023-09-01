@@ -15,7 +15,6 @@ namespace WebBioMetricApp.Controllers
 
         public IActionResult Index()
         {
-            _logger.LogInformation("First");
             return Ok();
         }
 

@@ -6,8 +6,6 @@ using WebBioMetricApp.Models;
 using WG3000_COMM.Core;
 namespace WebBioMetricApp.Controllers
 {
-    [Route("api/attendance")]
-    [ApiController]
     public class AttendanceController : ControllerBase
     {
         private readonly IConfiguration _configuration;
