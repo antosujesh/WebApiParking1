@@ -126,6 +126,7 @@ namespace WebApiParking.Controllers
 
                         connection.Open();
                         command.ExecuteNonQuery();
+                        connection.Close();
                     }
                 }
 
@@ -254,27 +255,29 @@ namespace WebApiParking.Controllers
         }
 
         [HttpPost("EditImage")]
-        public IActionResult SaveCarImage(VehicleModel model)
+        public IActionResult SaveCarImage([FromBody]string serialNo, string editImage, string imageType)
         {
-            if (string.IsNullOrWhiteSpace(model?.SerialNumber))
+            if (string.IsNullOrWhiteSpace(serialNo))
             {
                 return BadRequest("Vehicle Serial Number is Required");
             }
 
-            if (string.IsNullOrWhiteSpace(model?.CarImg) || string.IsNullOrWhiteSpace(model?.DriverImg))
+            if (string.IsNullOrWhiteSpace(editImage))
             {
-                return BadRequest("Both Driver and Car Images Null");
+                return BadRequest("Either Driver and Car Image Required");
             }
 
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
-                string query = "UPDATE tbl_Vehicles set Driver_Img=@Driver_Img, Car_Img= @Car_Img WHERE serial_number = @Serial_Number";
+                string query = "UPDATE tbl_Vehicles set {0} = @Edit_Img WHERE serial_number = @Serial_Number";
+                var field  =  imageType.Trim().ToUpper() == "C" ? "Car_Img" : "Driver_Img";
+
+                query = string.Format(query, field);    
 
                 using (SqlCommand command = new SqlCommand(query, connection))
                 {
-                    command.Parameters.AddWithValue("@Driver_Img", model.DriverImg.Trim());
-                    command.Parameters.AddWithValue("@Car_Img", model.CarImg.Trim());
-                    command.Parameters.AddWithValue("@Serial_Number", model.SerialNumber);
+                    command.Parameters.AddWithValue("@Edit_Img", editImage.Trim());
+                    command.Parameters.AddWithValue("@Serial_Number", serialNo);
                     connection.Open();
                     command.ExecuteNonQuery();
                     connection.Close();
@@ -311,7 +314,7 @@ namespace WebApiParking.Controllers
         }
 
         [HttpPost("SaveReader")]
-        public IActionResult SaveReader(DeviceReader reader)
+        public IActionResult SaveReader([FromBody]DeviceReader reader)
         {
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
@@ -362,7 +365,7 @@ namespace WebApiParking.Controllers
         }
 
         [HttpPost("AddDevice")]
-        public IActionResult CreateDevice(Device device)
+        public IActionResult CreateDevice([FromBody]Device device)
         {
             try
             {
@@ -392,7 +395,7 @@ namespace WebApiParking.Controllers
         }
 
         [HttpPost("AddReader")]
-        public IActionResult CreateDeviceReader(DeviceReader reader)
+        public IActionResult CreateDeviceReader([FromBody]DeviceReader reader)
         {
             try
             {

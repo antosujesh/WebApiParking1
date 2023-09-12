@@ -11,7 +11,7 @@ using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 namespace WebBioMetricApp.Controllers
 {
   
-    public class EmployeeController : ControllerBase
+    public class EmployeeController
     {
         private readonly IConfiguration _configuration;
         private readonly string _connectionString;
@@ -22,68 +22,66 @@ namespace WebBioMetricApp.Controllers
             _connectionString = _configuration.GetConnectionString("DefaultConnection");
         }
 
-        // GET: api/employees
-        [HttpPost("Listemployees")]
-        public IActionResult GetEmployees(ControllerListModelResq SearchID)
-        {
-            try
-            {
-                List<Employee> employees = new List<Employee>();
-                using (SqlConnection connection = new SqlConnection(_connectionString))
-                {
-                    string query = "select  (select top 1 CompanyName from Companies b where b.CompanyID=a.CompanyId) CompanyName ,(select RoleName from tbl_Roles where RoleID = a.Role) RoleName,   (select top 1 BranchName from tbl_Branch b where b.BranchID=a.BranchId and b.CompanyID=a.CompanyId) BranchName , * from Employees a "; string x = "";
-                    if (SearchID.SearchID == 1)
-                    {
-                        x = " where a.Status = 1";
-                    }
-                    else if (SearchID.SearchID == 0)
-                    {
-                        x = " where a.Status = 0";
-                    }
-                    query = query + x;
-                    using (SqlCommand command = new SqlCommand(query, connection))
-                    {
-                        connection.Open();
-                        using (SqlDataReader reader = command.ExecuteReader())
-                        {
-                            while (reader.Read())
-                            {
-                                Employee employee = new Employee
-                                {
-                                    EmployeeId = Convert.ToInt32(reader["EmployeeId"]),
-                                    BiometricId = Convert.ToInt32(reader["BiometricId"]),
-                                    CardNo = Convert.ToInt32(reader["CardNo"]),
-                                    Name = reader["Name"].ToString(),
-                                    Role = reader["RoleName"].ToString(),
-                                    Department = reader["Department"].ToString(),
-                                    PhoneNo = reader["PhoneNo"].ToString(),
-                                    EmailId = reader["EmailId"].ToString(),
-                                    CompanyId = Convert.ToInt32(reader["CompanyId"]),
-                                    Address = reader["Address"].ToString(),
-                                    CreatedBy = reader["CreatedBy"].ToString(),
-                                    CreatedDate = Convert.ToDateTime(reader["CreatedDate"]),
-                                    DeviceID = reader["DeviceID"].ToString().Split(','),
-                                   // DeviceIDs = reader["DeviceIDs"].ToString().Split(','),
-                                    CompanyName = reader["CompanyName"].ToString(),
-                                    BranchName = reader["BranchName"].ToString(),
-                                    Status = Convert.ToInt32(reader["Status"]),
-                                    BranchID = Convert.ToInt32(reader["BranchId"])
-                                };
-                                employees.Add(employee);
-                            }
-                        }
-                    }
-                }
-                return Ok(employees);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
-            }
-        }
+       
+        //public IActionResult GetEmployees(ControllerListModelResq SearchID)
+        //{
+        //    try
+        //    {
+        //        List<Employee> employees = new List<Employee>();
+        //        using (SqlConnection connection = new SqlConnection(_connectionString))
+        //        {
+        //            string query = "select  (select top 1 CompanyName from Companies b where b.CompanyID=a.CompanyId) CompanyName ,(select RoleName from tbl_Roles where RoleID = a.Role) RoleName,   (select top 1 BranchName from tbl_Branch b where b.BranchID=a.BranchId and b.CompanyID=a.CompanyId) BranchName , * from Employees a "; string x = "";
+        //            if (SearchID.SearchID == 1)
+        //            {
+        //                x = " where a.Status = 1";
+        //            }
+        //            else if (SearchID.SearchID == 0)
+        //            {
+        //                x = " where a.Status = 0";
+        //            }
+        //            query = query + x;
+        //            using (SqlCommand command = new SqlCommand(query, connection))
+        //            {
+        //                connection.Open();
+        //                using (SqlDataReader reader = command.ExecuteReader())
+        //                {
+        //                    while (reader.Read())
+        //                    {
+        //                        Employee employee = new Employee
+        //                        {
+        //                            EmployeeId = Convert.ToInt32(reader["EmployeeId"]),
+        //                            BiometricId = Convert.ToInt32(reader["BiometricId"]),
+        //                            CardNo = Convert.ToInt32(reader["CardNo"]),
+        //                            Name = reader["Name"].ToString(),
+        //                            Role = reader["RoleName"].ToString(),
+        //                            Department = reader["Department"].ToString(),
+        //                            PhoneNo = reader["PhoneNo"].ToString(),
+        //                            EmailId = reader["EmailId"].ToString(),
+        //                            CompanyId = Convert.ToInt32(reader["CompanyId"]),
+        //                            Address = reader["Address"].ToString(),
+        //                            CreatedBy = reader["CreatedBy"].ToString(),
+        //                            CreatedDate = Convert.ToDateTime(reader["CreatedDate"]),
+        //                            DeviceID = reader["DeviceID"].ToString().Split(','),
+        //                           // DeviceIDs = reader["DeviceIDs"].ToString().Split(','),
+        //                            CompanyName = reader["CompanyName"].ToString(),
+        //                            BranchName = reader["BranchName"].ToString(),
+        //                            Status = Convert.ToInt32(reader["Status"]),
+        //                            BranchID = Convert.ToInt32(reader["BranchId"])
+        //                        };
+        //                        employees.Add(employee);
+        //                    }
+        //                }
+        //            }
+        //        }
+        //        return Ok(employees);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return StatusCode(500, $"Internal server error: {ex.Message}");
+        //    }
+        //}
 
-        // POST: api/employees
-        [HttpPost("CreateEmployee")]
+
         public ResDuplicateCardModel CreateEmployee(Employee employee)
         {
             try
@@ -548,207 +546,206 @@ namespace WebBioMetricApp.Controllers
         }
 
 
-        [HttpPost]
-        public IActionResult UpdateEmployee(int id, Employee employee)
-        {
-            try
-            {
+  
+        //public IActionResult UpdateEmployee(int id, Employee employee)
+        //{
+        //    try
+        //    {
 
-                EmployeeResModel employeeResModel = new EmployeeResModel();
-                using (SqlConnection connection = new SqlConnection(_connectionString))
-                {
-                    string[] DeviceIDarray = employee.DeviceID;
-                    string DeviceIDarraycommaSeparatedString = string.Join(",", DeviceIDarray);
-                    //string[] DeviceIDsDeviceIDarray = employee.DeviceIDs;
-                    //string DeviceIDsDeviceIDarraycommaSeparatedString = string.Join(",", DeviceIDsDeviceIDarray);
-                    string query = "UPDATE Employees SET BiometricId = @BiometricId, Name = @Name,Status=@Status, Department = @Department,CardNo=@CardNo,Role=@Role,DeviceID=@DeviceID,BranchId=@BranchID, " +
-                                   "PhoneNo = @PhoneNo, EmailId = @EmailId, CompanyId = @CompanyId, " +
-                                   "Address = @Address  " +
-                                   "WHERE EmployeeId = @EmployeeId";
-                    using (SqlCommand command = new SqlCommand(query, connection))
-                    {
-                        command.Parameters.AddWithValue("@BiometricId", employee.BiometricId);
-                        command.Parameters.AddWithValue("@DeviceID", DeviceIDarraycommaSeparatedString);
-                        //command.Parameters.AddWithValue("@DeviceIDs", DeviceIDsDeviceIDarraycommaSeparatedString);
-                        command.Parameters.AddWithValue("@Name", employee.Name);
-                        command.Parameters.AddWithValue("@Department", employee.Department);
-                        command.Parameters.AddWithValue("@PhoneNo", employee.PhoneNo);
-                        command.Parameters.AddWithValue("@Role", employee.Role);
-                        command.Parameters.AddWithValue("@CardNo", employee.CardNo);
-                        command.Parameters.AddWithValue("@EmailId", employee.EmailId);
-                        command.Parameters.AddWithValue("@CompanyId", employee.CompanyId);
-                        command.Parameters.AddWithValue("@Address", employee.Address);
-                        command.Parameters.AddWithValue("@EmployeeId", id);
-                        command.Parameters.AddWithValue("@BranchID", employee.BranchID);
-                        command.Parameters.AddWithValue("@Status", employee.Status);
-                        connection.Open();
-                        int rowsAffected = command.ExecuteNonQuery();
-                        if (rowsAffected == 0)
-                        {
-                            employeeResModel.Result = "Employee not found";
-                        }
-                    }
-                }
-                employeeResModel.Result = "Employee updated successfully";
+        //        EmployeeResModel employeeResModel = new EmployeeResModel();
+        //        using (SqlConnection connection = new SqlConnection(_connectionString))
+        //        {
+        //            string[] DeviceIDarray = employee.DeviceID;
+        //            string DeviceIDarraycommaSeparatedString = string.Join(",", DeviceIDarray);
+        //            //string[] DeviceIDsDeviceIDarray = employee.DeviceIDs;
+        //            //string DeviceIDsDeviceIDarraycommaSeparatedString = string.Join(",", DeviceIDsDeviceIDarray);
+        //            string query = "UPDATE Employees SET BiometricId = @BiometricId, Name = @Name,Status=@Status, Department = @Department,CardNo=@CardNo,Role=@Role,DeviceID=@DeviceID,BranchId=@BranchID, " +
+        //                           "PhoneNo = @PhoneNo, EmailId = @EmailId, CompanyId = @CompanyId, " +
+        //                           "Address = @Address  " +
+        //                           "WHERE EmployeeId = @EmployeeId";
+        //            using (SqlCommand command = new SqlCommand(query, connection))
+        //            {
+        //                command.Parameters.AddWithValue("@BiometricId", employee.BiometricId);
+        //                command.Parameters.AddWithValue("@DeviceID", DeviceIDarraycommaSeparatedString);
+        //                //command.Parameters.AddWithValue("@DeviceIDs", DeviceIDsDeviceIDarraycommaSeparatedString);
+        //                command.Parameters.AddWithValue("@Name", employee.Name);
+        //                command.Parameters.AddWithValue("@Department", employee.Department);
+        //                command.Parameters.AddWithValue("@PhoneNo", employee.PhoneNo);
+        //                command.Parameters.AddWithValue("@Role", employee.Role);
+        //                command.Parameters.AddWithValue("@CardNo", employee.CardNo);
+        //                command.Parameters.AddWithValue("@EmailId", employee.EmailId);
+        //                command.Parameters.AddWithValue("@CompanyId", employee.CompanyId);
+        //                command.Parameters.AddWithValue("@Address", employee.Address);
+        //                command.Parameters.AddWithValue("@EmployeeId", id);
+        //                command.Parameters.AddWithValue("@BranchID", employee.BranchID);
+        //                command.Parameters.AddWithValue("@Status", employee.Status);
+        //                connection.Open();
+        //                int rowsAffected = command.ExecuteNonQuery();
+        //                if (rowsAffected == 0)
+        //                {
+        //                    employeeResModel.Result = "Employee not found";
+        //                }
+        //            }
+        //        }
+        //        employeeResModel.Result = "Employee updated successfully";
 
-                PrivilegeRequestModel privilegeRequestModel = new PrivilegeRequestModel();
-                privilegeRequestModel.FCardNo = uint.Parse(employee.CardNo.ToString());
-                privilegeRequestModel.FBeginYMD = DateTime.Parse("2023-05-01");
-                privilegeRequestModel.FBeginYMD = DateTime.Parse("2099-05-01");
-                privilegeRequestModel.DoorName = "";
-                privilegeRequestModel.FPIN = "0";
-                privilegeRequestModel.FControlSegID1 = 0;
-                privilegeRequestModel.FControlSegID2 = 0;
-                privilegeRequestModel.FControlSegID3 = 0;
-                privilegeRequestModel.FControlSegID4 = 0;
-                string[] values = employee.DeviceID;
+        //        PrivilegeRequestModel privilegeRequestModel = new PrivilegeRequestModel();
+        //        privilegeRequestModel.FCardNo = uint.Parse(employee.CardNo.ToString());
+        //        privilegeRequestModel.FBeginYMD = DateTime.Parse("2023-05-01");
+        //        privilegeRequestModel.FBeginYMD = DateTime.Parse("2099-05-01");
+        //        privilegeRequestModel.DoorName = "";
+        //        privilegeRequestModel.FPIN = "0";
+        //        privilegeRequestModel.FControlSegID1 = 0;
+        //        privilegeRequestModel.FControlSegID2 = 0;
+        //        privilegeRequestModel.FControlSegID3 = 0;
+        //        privilegeRequestModel.FControlSegID4 = 0;
+        //        string[] values = employee.DeviceID;
 
 
-                foreach (string value in values)
-                {
+        //        foreach (string value in values)
+        //        {
 
-                    string[] parts = value.Split('-');
+        //            string[] parts = value.Split('-');
 
-                    //foreach (string part in parts)
-                    //{
-                    //    Console.WriteLine(part);
-                    //}
-                    string ReaderNo = parts[0].ToString();
-                    if (ReaderNo == "1")
-                    {
-                        if (ReaderNo == "1")
-                        {
-                            privilegeRequestModel.FControlSegID1 = 1;
-                        }
-                        else
-                        {
-                            privilegeRequestModel.FControlSegID1 = 0;
-                        }
-                    }
-                    if (ReaderNo == "2")
-                    {
-                        if (ReaderNo == "2")
-                        {
-                            privilegeRequestModel.FControlSegID2 = 1;
-                        }
-                        else
-                        {
-                            privilegeRequestModel.FControlSegID2 = 0;
-                        }
-                    }
-                    if (ReaderNo == "3")
-                    {
-                        if (ReaderNo == "3")
-                        {
-                            privilegeRequestModel.FControlSegID3 = 1;
-                        }
-                        else
-                        {
-                            privilegeRequestModel.FControlSegID3 = 0;
-                        }
-                    }
-                    if (ReaderNo == "4")
-                    {
-                        if (ReaderNo == "4")
-                        {
-                            privilegeRequestModel.FControlSegID4 = 1;
-                        }
-                        else
-                        {
-                            privilegeRequestModel.FControlSegID4 = 0;
-                        }
-                    }
-                    privilegeRequestModel.ControllerSN = GetControllerID(parts[1].ToString());
+        //            //foreach (string part in parts)
+        //            //{
+        //            //    Console.WriteLine(part);
+        //            //}
+        //            string ReaderNo = parts[0].ToString();
+        //            if (ReaderNo == "1")
+        //            {
+        //                if (ReaderNo == "1")
+        //                {
+        //                    privilegeRequestModel.FControlSegID1 = 1;
+        //                }
+        //                else
+        //                {
+        //                    privilegeRequestModel.FControlSegID1 = 0;
+        //                }
+        //            }
+        //            if (ReaderNo == "2")
+        //            {
+        //                if (ReaderNo == "2")
+        //                {
+        //                    privilegeRequestModel.FControlSegID2 = 1;
+        //                }
+        //                else
+        //                {
+        //                    privilegeRequestModel.FControlSegID2 = 0;
+        //                }
+        //            }
+        //            if (ReaderNo == "3")
+        //            {
+        //                if (ReaderNo == "3")
+        //                {
+        //                    privilegeRequestModel.FControlSegID3 = 1;
+        //                }
+        //                else
+        //                {
+        //                    privilegeRequestModel.FControlSegID3 = 0;
+        //                }
+        //            }
+        //            if (ReaderNo == "4")
+        //            {
+        //                if (ReaderNo == "4")
+        //                {
+        //                    privilegeRequestModel.FControlSegID4 = 1;
+        //                }
+        //                else
+        //                {
+        //                    privilegeRequestModel.FControlSegID4 = 0;
+        //                }
+        //            }
+        //            privilegeRequestModel.ControllerSN = GetControllerID(parts[1].ToString());
 
-                }
+        //        }
 
-                AddPrivilege(privilegeRequestModel);
-                return Ok(employeeResModel);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
-            }
-        }
+        //        AddPrivilege(privilegeRequestModel);
+        //        return Ok(employeeResModel);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return StatusCode(500, $"Internal server error: {ex.Message}");
+        //    }
+        //}
 
-        // disable: 
-        [HttpPost("disable1")]
-        public IActionResult disableEmployee1(Employee_Act employeeId)
-        {
-            try
-            {
-                EmployeeResModel employeeResModel = new EmployeeResModel();
-                using (SqlConnection connection = new SqlConnection(_connectionString))
-                {
-                    string query = "UPDATE Employees SET Status = 0 WHERE EmployeeId = @EmployeeId";
-                    using (SqlCommand command = new SqlCommand(query, connection))
-                    {
-                        command.Parameters.AddWithValue("@EmployeeId", employeeId.EmployeeId);
 
-                        connection.Open();
-                        int rowsAffected = command.ExecuteNonQuery();
-                        if (rowsAffected == 0)
-                        {
-                            employeeResModel.Result = "Employee not found";
-                            return NotFound(employeeResModel);
-                        }
-                    }
-                }
-                PrivilegeRequestModel privilegeRequestModel = new PrivilegeRequestModel();
-                ReqAddPrivilegeUser addPrivilegeUser = new ReqAddPrivilegeUser();
-                addPrivilegeUser = GetCardNoID(employeeId.EmployeeId);
-                privilegeRequestModel.FCardNo = uint.Parse(addPrivilegeUser.CardNo.ToString());
-                privilegeRequestModel.FBeginYMD = DateTime.Parse("2023-05-01");
-                privilegeRequestModel.FEndYMD = DateTime.Parse("2099-05-01");
-                privilegeRequestModel.DoorName = "";
-                privilegeRequestModel.FPIN = "0";
-                privilegeRequestModel.FControlSegID1 = 0;
-                privilegeRequestModel.FControlSegID2 = 0;
-                privilegeRequestModel.FControlSegID3 = 0;
-                privilegeRequestModel.FControlSegID4 = 0;
+        //public IActionResult disableEmployee1(Employee_Act employeeId)
+        //{
+        //    try
+        //    {
+        //        EmployeeResModel employeeResModel = new EmployeeResModel();
+        //        using (SqlConnection connection = new SqlConnection(_connectionString))
+        //        {
+        //            string query = "UPDATE Employees SET Status = 0 WHERE EmployeeId = @EmployeeId";
+        //            using (SqlCommand command = new SqlCommand(query, connection))
+        //            {
+        //                command.Parameters.AddWithValue("@EmployeeId", employeeId.EmployeeId);
 
-                deletePrivilege(privilegeRequestModel, _connectionString);
+        //                connection.Open();
+        //                int rowsAffected = command.ExecuteNonQuery();
+        //                if (rowsAffected == 0)
+        //                {
+        //                    employeeResModel.Result = "Employee not found";
+        //                    return NotFound(employeeResModel);
+        //                }
+        //            }
+        //        }
+        //        PrivilegeRequestModel privilegeRequestModel = new PrivilegeRequestModel();
+        //        ReqAddPrivilegeUser addPrivilegeUser = new ReqAddPrivilegeUser();
+        //        addPrivilegeUser = GetCardNoID(employeeId.EmployeeId);
+        //        privilegeRequestModel.FCardNo = uint.Parse(addPrivilegeUser.CardNo.ToString());
+        //        privilegeRequestModel.FBeginYMD = DateTime.Parse("2023-05-01");
+        //        privilegeRequestModel.FEndYMD = DateTime.Parse("2099-05-01");
+        //        privilegeRequestModel.DoorName = "";
+        //        privilegeRequestModel.FPIN = "0";
+        //        privilegeRequestModel.FControlSegID1 = 0;
+        //        privilegeRequestModel.FControlSegID2 = 0;
+        //        privilegeRequestModel.FControlSegID3 = 0;
+        //        privilegeRequestModel.FControlSegID4 = 0;
+
+        //        deletePrivilege(privilegeRequestModel, _connectionString);
                
 
 
 
-                return Ok(employeeResModel);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
-            }
-        }
-        [HttpPost("enable")]
-        public IActionResult enableEmployee(Employee_Act employeeId)
-        {
-            try
-            {
-                EmployeeResModel employeeResModel = new EmployeeResModel();
-                using (SqlConnection connection = new SqlConnection(_connectionString))
-                {
-                    string query = "UPDATE Employees SET Status = 1 WHERE EmployeeId = @EmployeeId";
-                    using (SqlCommand command = new SqlCommand(query, connection))
-                    {
-                        command.Parameters.AddWithValue("@EmployeeId", employeeId.EmployeeId);
+        //        return Ok(employeeResModel);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return StatusCode(500, $"Internal server error: {ex.Message}");
+        //    }
+        //}
+    
+        //public IActionResult enableEmployee(Employee_Act employeeId)
+        //{
+        //    try
+        //    {
+        //        EmployeeResModel employeeResModel = new EmployeeResModel();
+        //        using (SqlConnection connection = new SqlConnection(_connectionString))
+        //        {
+        //            string query = "UPDATE Employees SET Status = 1 WHERE EmployeeId = @EmployeeId";
+        //            using (SqlCommand command = new SqlCommand(query, connection))
+        //            {
+        //                command.Parameters.AddWithValue("@EmployeeId", employeeId.EmployeeId);
 
-                        connection.Open();
-                        int rowsAffected = command.ExecuteNonQuery();
-                        if (rowsAffected == 0)
-                        {
-                            employeeResModel.Result = "Employee not found";
-                            return NotFound(employeeResModel);
-                        }
-                    }
-                }
-                employeeResModel.Result = "Employee enable successfully";
-                return Ok(employeeResModel);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
-            }
-        }
+        //                connection.Open();
+        //                int rowsAffected = command.ExecuteNonQuery();
+        //                if (rowsAffected == 0)
+        //                {
+        //                    employeeResModel.Result = "Employee not found";
+        //                    return NotFound(employeeResModel);
+        //                }
+        //            }
+        //        }
+        //        employeeResModel.Result = "Employee enable successfully";
+        //        return Ok(employeeResModel);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return StatusCode(500, $"Internal server error: {ex.Message}");
+        //    }
+        //}
 
 
 
@@ -784,146 +781,146 @@ namespace WebBioMetricApp.Controllers
 
 
 
-        [HttpPost("disable")]
-        public IActionResult disableEmployee(Employee_Act employeeId)
-        {
-            string returnMsg = "";
-            EmployeeResModel employeeResModel = new EmployeeResModel();
-            ResAddPrivilege resAddPrivilege = new ResAddPrivilege();
-            try
-            {
 
-                int value = employeeId.EmployeeId;
+        //public IActionResult disableEmployee(Employee_Act employeeId)
+        //{
+        //    string returnMsg = "";
+        //    EmployeeResModel employeeResModel = new EmployeeResModel();
+        //    ResAddPrivilege resAddPrivilege = new ResAddPrivilege();
+        //    try
+        //    {
+
+        //        int value = employeeId.EmployeeId;
                
                
-                    string Acc1 = "No", Acc2 = "No", Acc3 = "No", Acc4 = "No";
-                    ReqAddPrivilegeUser addPrivilegeUser = new ReqAddPrivilegeUser();
-                    addPrivilegeUser = GetCardNoID(value);
-                    PrivilegeRequestModel privilegeRequestModel = new PrivilegeRequestModel();
-                    privilegeRequestModel.FCardNo = uint.Parse(addPrivilegeUser.CardNo.ToString());
-                    privilegeRequestModel.FBeginYMD = DateTime.Parse("2023-05-01");
-                    privilegeRequestModel.FEndYMD = DateTime.Parse("2099-05-01");
-                    privilegeRequestModel.DoorName = "";
-                    privilegeRequestModel.FPIN = "0";
-                    privilegeRequestModel.FControlSegID1 = 0;
-                    privilegeRequestModel.FControlSegID2 = 0;
-                    privilegeRequestModel.FControlSegID3 = 0;
-                    privilegeRequestModel.FControlSegID4 = 0;
+        //            string Acc1 = "No", Acc2 = "No", Acc3 = "No", Acc4 = "No";
+        //            ReqAddPrivilegeUser addPrivilegeUser = new ReqAddPrivilegeUser();
+        //            addPrivilegeUser = GetCardNoID(value);
+        //            PrivilegeRequestModel privilegeRequestModel = new PrivilegeRequestModel();
+        //            privilegeRequestModel.FCardNo = uint.Parse(addPrivilegeUser.CardNo.ToString());
+        //            privilegeRequestModel.FBeginYMD = DateTime.Parse("2023-05-01");
+        //            privilegeRequestModel.FEndYMD = DateTime.Parse("2099-05-01");
+        //            privilegeRequestModel.DoorName = "";
+        //            privilegeRequestModel.FPIN = "0";
+        //            privilegeRequestModel.FControlSegID1 = 0;
+        //            privilegeRequestModel.FControlSegID2 = 0;
+        //            privilegeRequestModel.FControlSegID3 = 0;
+        //            privilegeRequestModel.FControlSegID4 = 0;
 
-                    string[] Devicevalues = addPrivilegeUser.DeviceIDs.Split(",");
-
-
-
-                    int t = 1;
-                    // foreach (string Devicevalue in Devicevalues)
-                    foreach (string Devicevalue in Devicevalues)
-                    {
-
-                        string[] parts = Devicevalue.Split('-');
-
-                        //foreach (string part in parts)
-                        //{
-                        //    Console.WriteLine(part);
-                        //}
-                        string ReaderNo = parts[0].ToString();
-                        if ("1" == "add")
-                        {
-
-                            if (ReaderNo == "1")
-                            {
-                                Acc1 = "1";
-                                // privilegeRequestModel.FControlSegID1 = 1;
-                            }
-                            if (ReaderNo == "2")
-                            {
-                                Acc2 = "1";
-                                //privilegeRequestModel.FControlSegID2 = 1;
-                            }
+        //            string[] Devicevalues = addPrivilegeUser.DeviceIDs.Split(",");
 
 
-                            if (ReaderNo == "3")
-                            {
-                                Acc3 = "1";
-                                //privilegeRequestModel.FControlSegID3 = 1;
-                            }
+
+        //            int t = 1;
+        //            // foreach (string Devicevalue in Devicevalues)
+        //            foreach (string Devicevalue in Devicevalues)
+        //            {
+
+        //                string[] parts = Devicevalue.Split('-');
+
+        //                //foreach (string part in parts)
+        //                //{
+        //                //    Console.WriteLine(part);
+        //                //}
+        //                string ReaderNo = parts[0].ToString();
+        //                if ("1" == "add")
+        //                {
+
+        //                    if (ReaderNo == "1")
+        //                    {
+        //                        Acc1 = "1";
+        //                        // privilegeRequestModel.FControlSegID1 = 1;
+        //                    }
+        //                    if (ReaderNo == "2")
+        //                    {
+        //                        Acc2 = "1";
+        //                        //privilegeRequestModel.FControlSegID2 = 1;
+        //                    }
 
 
-                            if (ReaderNo == "4")
-                            {
-                                Acc4 = "1";
-                                //privilegeRequestModel.FControlSegID4 = 1;
-                            }
+        //                    if (ReaderNo == "3")
+        //                    {
+        //                        Acc3 = "1";
+        //                        //privilegeRequestModel.FControlSegID3 = 1;
+        //                    }
 
 
-                        }
-                        else
-                        {
-
-                            if (ReaderNo == "1")
-                            {
-                                Acc1 = "0";
-                                // privilegeRequestModel.FControlSegID1 = 1;
-                            }
-                            if (ReaderNo == "2")
-                            {
-                                Acc2 = "0";
-                                //privilegeRequestModel.FControlSegID2 = 1;
-                            }
+        //                    if (ReaderNo == "4")
+        //                    {
+        //                        Acc4 = "1";
+        //                        //privilegeRequestModel.FControlSegID4 = 1;
+        //                    }
 
 
-                            if (ReaderNo == "3")
-                            {
-                                Acc3 = "0";
-                                //privilegeRequestModel.FControlSegID3 = 1;
-                            }
+        //                }
+        //                else
+        //                {
+
+        //                    if (ReaderNo == "1")
+        //                    {
+        //                        Acc1 = "0";
+        //                        // privilegeRequestModel.FControlSegID1 = 1;
+        //                    }
+        //                    if (ReaderNo == "2")
+        //                    {
+        //                        Acc2 = "0";
+        //                        //privilegeRequestModel.FControlSegID2 = 1;
+        //                    }
 
 
-                            if (ReaderNo == "4")
-                            {
-                                Acc4 = "0";
-                                //privilegeRequestModel.FControlSegID4 = 1;
-                            }
+        //                    if (ReaderNo == "3")
+        //                    {
+        //                        Acc3 = "0";
+        //                        //privilegeRequestModel.FControlSegID3 = 1;
+        //                    }
 
-                        }
-                        privilegeRequestModel.ControllerSN = GetControllerID(parts[1].ToString());
-                    if (Acc1 == "0") { privilegeRequestModel.FControlSegID1 = 0; } else { privilegeRequestModel.FControlSegID1 = 0; }
-                    if (Acc2 == "0") { privilegeRequestModel.FControlSegID2 = 0; } else { privilegeRequestModel.FControlSegID2 = 0; }
-                    if (Acc3 == "0") { privilegeRequestModel.FControlSegID3 = 0; } else { privilegeRequestModel.FControlSegID3 = 0; }
-                    if (Acc4 == "0") { privilegeRequestModel.FControlSegID4 = 0; } else { privilegeRequestModel.FControlSegID4 = 0; }
-                    returnMsg = AddPrivilege1(privilegeRequestModel, _connectionString, employeeId.EmployeeId.ToString());
-                }
+
+        //                    if (ReaderNo == "4")
+        //                    {
+        //                        Acc4 = "0";
+        //                        //privilegeRequestModel.FControlSegID4 = 1;
+        //                    }
+
+        //                }
+        //                privilegeRequestModel.ControllerSN = GetControllerID(parts[1].ToString());
+        //            if (Acc1 == "0") { privilegeRequestModel.FControlSegID1 = 0; } else { privilegeRequestModel.FControlSegID1 = 0; }
+        //            if (Acc2 == "0") { privilegeRequestModel.FControlSegID2 = 0; } else { privilegeRequestModel.FControlSegID2 = 0; }
+        //            if (Acc3 == "0") { privilegeRequestModel.FControlSegID3 = 0; } else { privilegeRequestModel.FControlSegID3 = 0; }
+        //            if (Acc4 == "0") { privilegeRequestModel.FControlSegID4 = 0; } else { privilegeRequestModel.FControlSegID4 = 0; }
+        //            returnMsg = AddPrivilege1(privilegeRequestModel, _connectionString, employeeId.EmployeeId.ToString());
+        //        }
                  
                       
-                    if (returnMsg == "Yes")
-                    {
-                        if ("1" == "add")
-                        {
-                            returnMsg = "Privilege Added successfully.";
-                        }
-                        else
-                        {
-                            returnMsg = "Privilege deleted successfully.";
-                        }
-                    }
-                    else
-                    {
-                        returnMsg = "Cant find controller, Problem in adding Privilege data .";
-                    }
+        //            if (returnMsg == "Yes")
+        //            {
+        //                if ("1" == "add")
+        //                {
+        //                    returnMsg = "Privilege Added successfully.";
+        //                }
+        //                else
+        //                {
+        //                    returnMsg = "Privilege deleted successfully.";
+        //                }
+        //            }
+        //            else
+        //            {
+        //                returnMsg = "Cant find controller, Problem in adding Privilege data .";
+        //            }
        
 
-                resAddPrivilege.Result = returnMsg;
-                // Return a success response
-                return Ok(resAddPrivilege);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
-            }
+        //        resAddPrivilege.Result = returnMsg;
+        //        // Return a success response
+        //        return Ok(resAddPrivilege);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return StatusCode(500, $"Internal server error: {ex.Message}");
+        //    }
 
 
 
 
-        }
+        //}
         private static string AddPrivilege1(PrivilegeRequestModel requestModel, string _connectionString, string EmployeeId)
         {
             string retuns = "";
